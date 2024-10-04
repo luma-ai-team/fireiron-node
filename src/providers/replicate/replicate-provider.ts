@@ -62,7 +62,7 @@ export abstract class ReplicateProvider<Input> implements PredictionProvider<Inp
     }
 
     public makeWebhookURL(userIdentifier: string): string {
-        return "https://" + this.domain + "predictionHook?user=" + userIdentifier;
+        return "https://" + this.domain + "/predictionHook?user=" + userIdentifier;
     }
 
     abstract makeReplicateOptions(userIdentifier: string, input: Input): Promise<any>;
