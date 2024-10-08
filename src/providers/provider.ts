@@ -27,5 +27,7 @@ export type PredictionEvent = PredictionCompletionEvent | PredictionFailureEvent
 
 export interface PredictionProvider<Input> {
     run(userIdentifier: string, input: Input): Promise<Prediction>;
+
+    canProcessHook(query: any, body: any): boolean;
     processHook(query: any, body: any): Promise<PredictionEvent>;
 } 

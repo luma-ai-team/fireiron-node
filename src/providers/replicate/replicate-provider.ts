@@ -25,9 +25,16 @@ export abstract class ReplicateProvider<Input> implements PredictionProvider<Inp
     }
 
     public async run(userIdentifier: string, input: Input): Promise<Prediction> {
-        const options = await this.makeReplicateOptions(userIdentifier, input);
-        const result = await this.replicate.predictions.create(options);
+        var options = await this.makeReplicateOptions(userIdentifier, input);
+        options.webhook = this.makeWebhookURL(userIdentifier);
+        options.webhook_events_filter = ["completed"];
+        
+        const result = await this.replicate.predictions.create(options as any);
         return await this.makePrediction(input, result);
+    }
+
+    public canProcessHook(query: any, body: any): boolean {
+        return query.source == "replicate";
     }
 
     public async processHook(query: any, body: any): Promise<PredictionEvent> {
@@ -62,9 +69,9 @@ export abstract class ReplicateProvider<Input> implements PredictionProvider<Inp
     }
 
     public makeWebhookURL(userIdentifier: string): string {
-        return "https://" + this.domain + "/predictionHook?user=" + userIdentifier;
+        return "https://" + this.domain + "/predictionHook?source=replicate&user=" + userIdentifier;
     }
 
-    abstract makeReplicateOptions(userIdentifier: string, input: Input): Promise<any>;
+    abstract makeReplicateOptions(userIdentifier: string, input: Input): Promise<ReplicateOptions>;
     abstract makePrediction(input: Input, output: Replicate.Prediction): Promise<Prediction>;
 }

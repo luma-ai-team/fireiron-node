@@ -5,6 +5,10 @@ import * as Firestore from "firebase-admin/firestore";
 import { Action } from "./src/actions/action"
 import { Webhook } from "./src/webhooks/webhook";
 
+export * from "./src/firebase/firestore-adapter";
+export * from "./src/firebase/messaging-adapter";
+export * from "./src/firebase/storage-adapter";
+
 export * from "./src/actions/action";
 export * from "./src/actions/adapty-link";
 export * from "./src/actions/fcm-link";
