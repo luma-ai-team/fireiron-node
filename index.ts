@@ -1,4 +1,4 @@
-import { onCall, onRequest } from "firebase-functions/v2/https"
+import { CallableOptions, HttpsOptions, onCall, onRequest } from "firebase-functions/v2/https"
 import * as Admin from "firebase-admin"
 import * as Firestore from "firebase-admin/firestore";
 import * as Logger from "firebase-functions/logger"
@@ -38,8 +38,8 @@ export class Fireiron {
         this.exports = exports;
     }
 
-    public registerAction<Request>(action: Action<Request>) {
-        this.exports[action.name] = onCall( async (request) => {
+    public registerAction<Request>(action: Action<Request>, options: CallableOptions = {}) {
+        this.exports[action.name] = onCall(options, async (request) => {
             if (this.isLoggingEnabled) {
                 Logger.log(request.data);
             }
@@ -48,8 +48,8 @@ export class Fireiron {
         });
     }
 
-    public registerWebhook(webhook: Webhook) {
-        this.exports[webhook.name] = onRequest( async (request, response) => {
+    public registerWebhook(webhook: Webhook, options: HttpsOptions = {}) {
+        this.exports[webhook.name] = onRequest(options, async (request, response) => {
             if (this.isLoggingEnabled) {
                 Logger.log(request.query, request.body);
             }
