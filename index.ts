@@ -1,6 +1,7 @@
 import { onCall, onRequest } from "firebase-functions/v2/https"
 import * as Admin from "firebase-admin"
 import * as Firestore from "firebase-admin/firestore";
+import * as Logger from "firebase-functions/logger"
 
 import { Action } from "./src/actions/action"
 import { Webhook } from "./src/webhooks/webhook";
@@ -27,6 +28,7 @@ export * from "./src/models/prediction";
 
 export class Fireiron {
     exports: any;
+    public isLoggingEnabled: boolean = false;
 
     constructor(exports: any) {
         Admin.initializeApp();
@@ -38,12 +40,20 @@ export class Fireiron {
 
     public registerAction<Request>(action: Action<Request>) {
         this.exports[action.name] = onCall( async (request) => {
+            if (this.isLoggingEnabled) {
+                Logger.log(request.data);
+            }
+
             return await action.run(request.data as Request)
         });
     }
 
     public registerWebhook(webhook: Webhook) {
         this.exports[webhook.name] = onRequest( async (request, response) => {
+            if (this.isLoggingEnabled) {
+                Logger.log(request.query, request.body);
+            }
+
             const result = await webhook.handle(request);
             response.send(result);
         });

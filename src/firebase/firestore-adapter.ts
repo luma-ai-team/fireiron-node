@@ -56,7 +56,7 @@ export class FirestoreAdapter {
             await reference.set(user);
         }
     
-        return reference
+        return reference;
     }
 
     public async fetchRewardAmount(identifier: string): Promise<number> {
@@ -104,7 +104,7 @@ export class FirestoreAdapter {
 
     public async storePrediction(userIdentifier: string, prediction: Prediction) {
         const reference = this.makePredictionReference(userIdentifier, prediction.identifier);
-        await reference.update(prediction)
+        await reference.set(prediction);
     }
 
     public async fetchPrediction(userIdentifier: string, predictionIdentifier: string): Promise<Prediction> {
