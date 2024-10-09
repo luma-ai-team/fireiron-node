@@ -109,6 +109,7 @@ export class FirestoreAdapter {
 
     public async fetchPrediction(userIdentifier: string, predictionIdentifier: string): Promise<Prediction> {
         const reference = this.makePredictionReference(userIdentifier, predictionIdentifier);
-        return (await reference.get()).data as unknown as Prediction;
+        const document = await reference.get();
+        return document.data() as Prediction;
     }
 }

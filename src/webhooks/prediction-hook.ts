@@ -32,7 +32,6 @@ export class PredictionHook<Input> implements Webhook {
         Logger.debug(request.query);
         Logger.debug(request.body);
 
-        
         const userIdentifier = request.query.user as string;
         if (userIdentifier == null) {
             Logger.error("No user identifier");
