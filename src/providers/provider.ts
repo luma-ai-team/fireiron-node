@@ -1,4 +1,5 @@
 import { Prediction, PredictionError } from "../models/prediction";
+import { PredictionWebhookParameters } from "../webhooks/prediction-hook";
 
 export enum PredictionState {
     Pending,
@@ -26,7 +27,8 @@ export interface PredictionUpdateEvent {
 export type PredictionEvent = PredictionCompletionEvent | PredictionFailureEvent | PredictionUpdateEvent;
 
 export interface PredictionProvider<Input> {
-    run(userIdentifier: string, input: Input): Promise<Prediction>;
+    name: string;
+    run(userIdentifier: string, input: Input, webhookParameters: PredictionWebhookParameters): Promise<Prediction>;
 
     canProcessHook(query: any, body: any): boolean;
     processHook(query: any, body: any): Promise<PredictionEvent>;

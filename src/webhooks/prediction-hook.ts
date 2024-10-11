@@ -12,9 +12,39 @@ export type Notification = {
     message: string;
 }
 
+export class PredictionWebhookParameters {
+    public domain: string;
+    public endpoint: string;
+    public source: string;
+    public user: string;
+    public parent?: string;
+    public additionalParameters: any;
+
+    public constructor(domain: string, endpoint: string, source: string, user: string) {
+        this.domain = domain;
+        this.endpoint = endpoint;
+        this.source = source;
+        this.user = user;
+    }
+
+    public makeURL(): string {
+        var url = `https://${this.domain}/${this.endpoint}?source=${this.source}&user=${this.user}`;
+        if (this.parent != null) {
+            url += `&parent=${this.parent}`;
+        }
+
+        for (const key in this.additionalParameters) {
+            url += `&${key}=${this.additionalParameters[key]}`;
+        }
+
+        return url;
+    }
+};
+
 export class PredictionHook<Input> implements Webhook {
     public name = "predictionHook";
     provider: PredictionProvider<Input>;
+    domain: string;
 
     firestore: FirestoreAdapter = new FirestoreAdapter();
     messaging: MessagingAdapter = new MessagingAdapter();
@@ -24,8 +54,15 @@ export class PredictionHook<Input> implements Webhook {
         message: "Tap to check it out"
     };
 
-    public constructor(provider: PredictionProvider<Input>) {
+    public constructor(provider: PredictionProvider<Input>, domain: string) {
         this.provider = provider;
+        this.domain = domain;
+    }
+
+    public makeParameters(user: string, source: string, parent?: string): PredictionWebhookParameters {
+        const options = new PredictionWebhookParameters(this.domain, this.name, user, source);
+        options.parent = parent;
+        return options;
     }
 
     public async handle(request: Functions.Request): Promise<Object> {
@@ -33,12 +70,18 @@ export class PredictionHook<Input> implements Webhook {
         Logger.debug(request.body);
 
         const userIdentifier = request.query.user as string;
+        const parent = request.query.parent;
+
         if (userIdentifier == null) {
             Logger.error("No user identifier");
             return {};
         }
 
         const event = await this.provider.processHook(request.query, request.body);
+        if (parent != null) {
+            event.identifier = parent as string
+        }
+
         switch (event.state) {
             case PredictionState.Pending:
                 await this.handleUpdate(event, userIdentifier);
