@@ -7,6 +7,7 @@ import * as Logger from "firebase-functions/logger";
 
 import { Action } from "./src/actions/action";
 import { Webhook } from "./src/webhooks/webhook";
+import { FirestoreHook } from "./src/dbhooks/firestore-hook";
 
 export * from "./src/firebase/firestore-adapter";
 export * from "./src/firebase/messaging-adapter";
@@ -50,19 +51,18 @@ export class Fireiron {
         });
     }
 
-    public registerDocumentCreateAction<Request>(path: string, action: Action<Request>, options: EventHandlerOptions = {}) {
+    public registerDocumentCreateHook(hook: FirestoreHook<Object>, options: EventHandlerOptions = {}) {
         var documentOptions = options as any;
-        documentOptions["document"] = path;
+        documentOptions["document"] = hook.path;
 
-        this.exports[action.name] = onDocumentCreated(documentOptions as DocumentOptions, async (event) => {
+        this.exports[hook.name] = onDocumentCreated(documentOptions as DocumentOptions, async (event) => {
             if (this.isLoggingEnabled) {
                 Logger.log(event.data);
             }
 
-            await action.run(event.data as Request);
+            await hook.handle(event);
         });
     }
-
     public registerWebhook(webhook: Webhook, options: HttpsOptions = {}) {
         this.exports[webhook.name] = onRequest(options, async (request, response) => {
             if (this.isLoggingEnabled) {
