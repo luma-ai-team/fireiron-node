@@ -1,9 +1,11 @@
-import { CallableOptions, HttpsOptions, onCall, onRequest } from "firebase-functions/v2/https"
-import * as Admin from "firebase-admin"
+import { EventHandlerOptions } from "firebase-functions/v2";
+import { CallableOptions, HttpsOptions, onCall, onRequest } from "firebase-functions/v2/https";
+import { DocumentOptions, onDocumentCreated } from "firebase-functions/v2/firestore";
+import * as Admin from "firebase-admin";
 import * as Firestore from "firebase-admin/firestore";
-import * as Logger from "firebase-functions/logger"
+import * as Logger from "firebase-functions/logger";
 
-import { Action } from "./src/actions/action"
+import { Action } from "./src/actions/action";
 import { Webhook } from "./src/webhooks/webhook";
 
 export * from "./src/firebase/firestore-adapter";
@@ -45,6 +47,19 @@ export class Fireiron {
             }
 
             return await action.run(request.data as Request)
+        });
+    }
+
+    public registerDocumentCreateAction<Request>(path: string, action: Action<Request>, options: EventHandlerOptions = {}) {
+        var documentOptions = options as any;
+        documentOptions["document"] = path;
+
+        this.exports[action.name] = onDocumentCreated(documentOptions as DocumentOptions, async (event) => {
+            if (this.isLoggingEnabled) {
+                Logger.log(event.data);
+            }
+
+            await action.run(event.data as Request);
         });
     }
 
