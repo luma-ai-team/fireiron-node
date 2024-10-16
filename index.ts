@@ -1,6 +1,6 @@
 import { EventHandlerOptions } from "firebase-functions/v2";
 import { CallableOptions, HttpsOptions, onCall, onRequest } from "firebase-functions/v2/https";
-import { DocumentOptions, onDocumentCreated } from "firebase-functions/v2/firestore";
+import { DocumentOptions, FirestoreEvent, onDocumentCreated } from "firebase-functions/v2/firestore";
 import * as Admin from "firebase-admin";
 import * as Firestore from "firebase-admin/firestore";
 import * as Logger from "firebase-functions/logger";
@@ -53,16 +53,16 @@ export class Fireiron {
         });
     }
 
-    public registerDocumentCreateHook(hook: FirestoreHook<Object>, options: EventHandlerOptions = {}) {
+    public registerDocumentCreateHook<Input>(hook: FirestoreHook<Input>, options: EventHandlerOptions = {}) {
         var documentOptions = options as any;
         documentOptions["document"] = hook.path;
 
         this.exports[hook.name] = onDocumentCreated(documentOptions as DocumentOptions, async (event) => {
             if (this.isLoggingEnabled) {
-                Logger.log(event.data);
+                Logger.log(event);
             }
 
-            await hook.handle(event);
+            await hook.handle(event as FirestoreEvent<Firestore.QueryDocumentSnapshot<Input>>);
         });
     }
     public registerWebhook(webhook: Webhook, options: HttpsOptions = {}) {
