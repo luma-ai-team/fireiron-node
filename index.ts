@@ -17,6 +17,7 @@ export * from "./src/actions/action";
 export * from "./src/actions/adapty-link";
 export * from "./src/actions/fcm-link";
 export * from "./src/actions/predict";
+export * from "./src/actions/redeem";
 
 export * from "./src/webhooks/webhook";
 export * from "./src/webhooks/adapty-hook";

@@ -40,9 +40,11 @@ export class FirestoreAdapter {
     async makeUserData(identifier: string): Promise<User> {
         const defaults = await this.makeDefaultsReference().get();
         const balance = await defaults.data()?.balance ?? 0;
+        const redeemLimit = await defaults.data()?.redeemLimit ?? 0;
         return {
             identifier: identifier,
             balance: balance,
+            redeemLimit: redeemLimit,
             pushToken: undefined
         };
     }
