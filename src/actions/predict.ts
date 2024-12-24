@@ -1,6 +1,4 @@
 import { FirestoreAdapter } from "../firebase/firestore-adapter";
-import { PredictionProvider } from "../providers/provider";
-import { PredictionCompletionHook } from "../webhooks/prediction-completion-hook";
 import { Action } from "./action";
 
 export type PredictActionRequest<Input> = {
