@@ -6,6 +6,8 @@ export type PredictionError = {
 export type Prediction = {
     identifier: string;
     input: Object;
+
+    externalIdentifier?: string;
     continuation?: Object;
     metadata?: Object;
     error?: PredictionError;

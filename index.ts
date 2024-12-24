@@ -21,7 +21,7 @@ export * from "./src/actions/redeem";
 
 export * from "./src/webhooks/webhook";
 export * from "./src/webhooks/adapty-hook";
-export * from "./src/webhooks/prediction-hook";
+export * from "./src/webhooks/prediction-completion-hook";
 
 export * from "./src/dbhooks/firestore-hook";
 

@@ -25,8 +25,12 @@ export class FirestoreAdapter {
         return this.makeUserReference(userIdentifier).collection("predictions");
     }
 
-    makePredictionReference(userIdentifier: string, predictionIdentifier: string): Firestore.DocumentReference<Firestore.DocumentData> {
-        return this.makePredicionsReference(userIdentifier).doc(predictionIdentifier);
+    makePredictionReference(userIdentifier: string, predictionIdentifier?: string): Firestore.DocumentReference<Firestore.DocumentData> {
+        if (predictionIdentifier != null) {
+            return this.makePredicionsReference(userIdentifier).doc(predictionIdentifier);
+        }
+
+        return this.makePredicionsReference(userIdentifier).doc();
     }
 
     makeProductsReference(): Firestore.DocumentReference<Firestore.DocumentData> {
@@ -107,6 +111,16 @@ export class FirestoreAdapter {
     public async storePrediction(userIdentifier: string, prediction: Prediction) {
         const reference = this.makePredictionReference(userIdentifier, prediction.identifier);
         await reference.set(prediction);
+    }
+
+    public async createPrediction(userIdentifier: string, input: Object): Promise<Prediction> {
+        const reference = this.makePredictionReference(userIdentifier);
+        const prediction: Prediction = {
+            identifier: reference.id,
+            input: input
+        }
+        await reference.set(prediction);
+        return prediction;
     }
 
     public async fetchPrediction(userIdentifier: string, predictionIdentifier: string): Promise<Prediction> {

@@ -12,23 +12,29 @@ export type Notification = {
     message: string;
 }
 
-export class PredictionWebhookParameters {
+export class PredictionCompletionWebhookParameters {
     public domain: string;
     public endpoint: string;
     public source: string;
     public user: string;
+    public identifier?: string;
     public parent?: string;
     public additionalParameters: any;
 
-    public constructor(domain: string, endpoint: string, source: string, user: string) {
+    public constructor(domain: string, endpoint: string, source: string, user: string, identifier?: string) {
         this.domain = domain;
         this.endpoint = endpoint;
         this.source = source;
         this.user = user;
+        this.identifier = identifier;
     }
 
     public makeURL(): string {
         var url = `https://${this.domain}/${this.endpoint}?source=${this.source}&user=${this.user}`;
+        if (this.identifier != null) {
+            url += `&identifier=${this.identifier}`;
+        }
+
         if (this.parent != null) {
             url += `&parent=${this.parent}`;
         }
@@ -41,7 +47,7 @@ export class PredictionWebhookParameters {
     }
 };
 
-export class PredictionHook<Input> implements Webhook {
+export class PredictionCompletionHook<Input> implements Webhook {
     public name = "predictionHook";
     provider: PredictionProvider<Input>;
     domain: string;
@@ -59,8 +65,9 @@ export class PredictionHook<Input> implements Webhook {
         this.domain = domain;
     }
 
-    public makeParameters(user: string, source: string, parent?: string): PredictionWebhookParameters {
-        const options = new PredictionWebhookParameters(this.domain, this.name, user, source);
+    public makeParameters(user: string, source: string, identifier?: string, parent?: string): PredictionCompletionWebhookParameters {
+        const options = new PredictionCompletionWebhookParameters(this.domain, this.name, user, source);
+        options.identifier = identifier;
         options.parent = parent;
         return options;
     }

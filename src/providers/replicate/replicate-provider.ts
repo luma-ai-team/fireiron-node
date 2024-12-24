@@ -1,5 +1,5 @@
 import { Prediction } from "../../models/prediction";
-import { PredictionWebhookParameters } from "../../webhooks/prediction-hook";
+import { PredictionCompletionWebhookParameters } from "../../webhooks/prediction-completion-hook";
 import { PredictionProvider, PredictionState, PredictionEvent } from "../provider";
 
 import * as Replicate from "replicate";
@@ -24,7 +24,7 @@ export abstract class ReplicateProvider<Input> implements PredictionProvider<Inp
         });
     }
 
-    public async run(userIdentifier: string, input: Input, webhookParameters: PredictionWebhookParameters): Promise<Prediction> {
+    public async run(userIdentifier: string, input: Input, webhookParameters: PredictionCompletionWebhookParameters): Promise<Prediction> {
         var options = await this.makeReplicateOptions(userIdentifier, input);
         options.webhook = webhookParameters.makeURL();
         options.webhook_events_filter = ["completed"];
