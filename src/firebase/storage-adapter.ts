@@ -41,7 +41,7 @@ export class StorageAdapter {
         });
     }
     
-    public async makeTemporaryFile(filename: string, content?: any) {
+    public makeTemporaryFile(filename: string, content?: any): string {
         const target = "/tmp/" + filename;
         if (content != null) {
             fs.writeFileSync(target, content);
