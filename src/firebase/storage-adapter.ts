@@ -5,12 +5,13 @@ import axios, { Axios } from "axios"
 import fs from "fs";
 import util from "util";
 import stream from "stream";
-const pipeline = util.promisify(stream.pipeline);
 
 export class StorageAdapter {
     bucket: string
     client: Axios;
     temporaryFiles: string[] = [];
+
+    pipeline: Function = util.promisify(stream.pipeline);
 
     public constructor(bucket: string) {
         this.bucket = bucket;
@@ -26,7 +27,7 @@ export class StorageAdapter {
         const response = await this.client.get(url, {
             responseType: "stream"
         });
-        await pipeline(response.data, fs.createWriteStream(target));
+        await this.pipeline(response.data, fs.createWriteStream(target));
         this.temporaryFiles.push(target);
         return target;
     }
@@ -40,6 +41,16 @@ export class StorageAdapter {
         });
     }
     
+    public async makeTemporaryFile(filename: string, content?: any) {
+        const target = "/tmp/" + filename;
+        if (content != null) {
+            fs.writeFileSync(target, content);
+        }
+
+        this.temporaryFiles.push(target);
+        return target;
+    }
+
     public async cleanup() {
         for (var path of this.temporaryFiles) {
             fs.unlinkSync(path);
