@@ -21,6 +21,62 @@ export class PredictionCompletionWebhookParameters {
     public parent?: string;
     public additionalParameters: any;
 
+    public static parseURL(url: string): PredictionCompletionWebhookParameters | undefined {
+        const object = new URL(url);
+        const domain = object.hostname;
+        const endpoint = object.pathname;
+        
+        var query: any = {};
+        for (const entry of object.searchParams.entries()) {
+            const key = entry[0];
+            const value = entry[1];
+            query[key] = value;
+        }
+
+        return this.parseQuery(query, domain, endpoint);
+    }
+
+    public static parseQuery(query: any, domain?: string, endpoint?: string): PredictionCompletionWebhookParameters | undefined {
+        var source: string | undefined;
+        var user: string | undefined;
+        var identifier: string | undefined;
+        var parent: string | undefined;
+        var additionalParameters: any = {};
+
+        for (const key in query) {
+            const value = query[key];
+            switch (key) {
+                case "source":
+                    source = value;
+                    break;
+                case "user":
+                    user = value;
+                    break;
+                case "identifier":
+                    identifier = value;
+                    break;
+                case "parent":
+                    parent = value;
+                    break;
+                default:
+                    additionalParameters[key] = value;
+            }
+        }
+
+        if (source == null) {
+            return undefined;
+        }
+        
+        if (user == null) {
+            return undefined;
+        }
+
+        const parameters = new PredictionCompletionWebhookParameters(domain ?? "", endpoint ?? "", source, user, identifier)
+        parameters.parent = parent;
+        parameters.additionalParameters = additionalParameters;
+        return parameters;
+    }
+
     public constructor(domain: string, endpoint: string, source: string, user: string, identifier?: string) {
         this.domain = domain;
         this.endpoint = endpoint;

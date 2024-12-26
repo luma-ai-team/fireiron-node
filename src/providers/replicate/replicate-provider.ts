@@ -38,7 +38,8 @@ export abstract class ReplicateProvider<Input> implements PredictionProvider<Inp
     }
 
     public async processHook(query: any, body: any): Promise<PredictionEvent> {
-        const predictionIdentifier = query.prediction ?? body.id;
+        const parameters = PredictionCompletionWebhookParameters.parseQuery(query);
+        const predictionIdentifier = parameters?.identifier ?? body.id;
 
         var output = body.output;
         if (Array.isArray(output)) {
