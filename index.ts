@@ -24,6 +24,7 @@ export * from "./src/webhooks/adapty-hook";
 export * from "./src/webhooks/prediction-completion-hook";
 
 export * from "./src/dbhooks/firestore-hook";
+export * from "./src/dbhooks/prediction-request-hook";
 
 export * from "./src/providers/provider";
 export * from "./src/providers/replicate/replicate-provider";
