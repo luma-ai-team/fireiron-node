@@ -31,15 +31,23 @@ export class PredictionRequestHook<Input> implements FirestoreHook<PredictionReq
 
         const prediction = event.data.data() as Prediction;
         const webhookParameters = this.webhook.makeParameters(userIdentifier, this.provider.name, predictionIdentifier);
+        const reference = this.firestore.makePredictionReference(userIdentifier, predictionIdentifier);
         
-        const result = await this.provider.run(userIdentifier, prediction.input as Input, webhookParameters);
-        await this.firestore.makePredictionReference(userIdentifier, predictionIdentifier).update({
-            externalIdentifier: result.identifier,
-            continuation: result.continuation,
-            metadata: result.metadata,
-            error: result.error,
-            output: result.output
-        });
+        try {
+            const result = await this.provider.run(userIdentifier, prediction.input as Input, webhookParameters);
+            await reference.update({
+                externalIdentifier: result.identifier,
+                continuation: result.continuation,
+                metadata: result.metadata,
+                error: result.error,
+                output: result.output
+            });
+        }
+        catch (error) {
+            await reference.update({
+                error: error
+            });
+        }
 
         return {
             identifier: prediction.identifier
