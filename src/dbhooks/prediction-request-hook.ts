@@ -45,7 +45,7 @@ export class PredictionRequestHook<Input> implements FirestoreHook<PredictionReq
         }
         catch (error) {
             await reference.update({
-                error: error
+                error: `${error}`
             });
         }
 
