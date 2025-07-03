@@ -1,5 +1,5 @@
-import * as Storage from "firebase-admin/storage"
-import { Bucket } from '@google-cloud/storage';
+import * as AdminStorage from "firebase-admin/storage"
+import { Bucket, Storage, File } from '@google-cloud/storage';
 
 import axios, { Axios } from "axios"
 import fs from "fs";
@@ -19,7 +19,7 @@ export class StorageAdapter {
     }
 
     public makeBucket(): Bucket {
-        return Storage.getStorage().bucket(this.bucket);
+        return AdminStorage.getStorage().bucket(this.bucket);
     }
 
     public async downloadTemporaryCopy(url: string, filename: string): Promise<string> {
@@ -63,7 +63,13 @@ export class StorageAdapter {
         const [file, _] = await bucket.upload(source, {
             destination: target
         });
-        const targetURL = await Storage.getDownloadURL(file);
+        const targetURL = await AdminStorage.getDownloadURL(file);
         return targetURL;
+    }
+
+    public async publish(uri: string): Promise<string> {
+        const storage = new Storage();
+        const file = File.from(uri, storage);
+        return await AdminStorage.getDownloadURL(file);
     }
 }
