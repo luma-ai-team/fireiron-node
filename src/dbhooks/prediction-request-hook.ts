@@ -3,7 +3,7 @@ import { FirestoreEvent } from "firebase-functions/v2/firestore";
 
 import { FirestoreAdapter } from "../firebase/firestore-adapter";
 import { FirestoreHook } from "./firestore-hook";
-import { Prediction } from "../models/prediction";
+import { Prediction, PredictionError } from "../models/prediction";
 import { PredictionProvider } from "../providers/provider";
 import { PredictionCompletionHook } from "../webhooks/prediction-completion-hook";
 
@@ -45,7 +45,10 @@ export class PredictionRequestHook<Input> implements FirestoreHook<PredictionReq
         }
         catch (error) {
             await reference.update({
-                error: `${error}`
+                error: {
+                    code: -1,
+                    message: `${error}`
+                } as PredictionError
             });
         }
 
