@@ -3,13 +3,18 @@ export type PredictionError = {
     message: string;
 };
 
+export type PredictionMetadata = {
+    creationTime: number;
+    estimatedCompletionTime?: number;
+};
+
 export type Prediction = {
     identifier: string;
     input: Object;
 
     externalIdentifier?: string;
     continuation?: Object;
-    metadata?: Object;
+    metadata?: PredictionMetadata | Object;
     error?: PredictionError;
     output?: Object;
 };

@@ -3,7 +3,7 @@ import { FirestoreEvent } from "firebase-functions/v2/firestore";
 
 import { FirestoreAdapter } from "../firebase/firestore-adapter";
 import { FirestoreHook } from "./firestore-hook";
-import { Prediction, PredictionError } from "../models/prediction";
+import { Prediction, PredictionError, PredictionMetadata } from "../models/prediction";
 import { PredictionProvider } from "../providers/provider";
 import { PredictionCompletionHook } from "../webhooks/prediction-completion-hook";
 
@@ -13,7 +13,7 @@ export type PredictionRequestHookDocument<Input> = {
 };
 
 export class PredictionRequestHook<Input> implements FirestoreHook<PredictionRequestHookDocument<Input>> {
-    public name = "convert";
+    public name = "run";
     public path = "users/{userIdentifier}/predictions/{predictionIdentifier}";
 
     provider: PredictionProvider<Input>;
@@ -34,11 +34,19 @@ export class PredictionRequestHook<Input> implements FirestoreHook<PredictionReq
         const reference = this.firestore.makePredictionReference(userIdentifier, predictionIdentifier);
         
         try {
+            const metadata: PredictionMetadata | undefined = prediction.metadata as PredictionMetadata;
+            if (metadata) {
+                const runTime = this.provider.estimateRunTime(prediction.input as Input);
+                await reference.update({
+                    "metadata.estimatedCompletionTime": metadata.creationTime + runTime
+                })
+            }
+
             const result = await this.provider.run(userIdentifier, prediction.input as Input, webhookParameters);
             await reference.update({
                 externalIdentifier: result.identifier,
                 continuation: result.continuation,
-                metadata: result.metadata,
+                metadata: {...prediction.metadata, ...result.metadata},
                 error: result.error,
                 output: result.output
             });

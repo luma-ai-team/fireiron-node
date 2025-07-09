@@ -28,6 +28,7 @@ export type PredictionEvent = PredictionCompletionEvent | PredictionFailureEvent
 
 export interface PredictionProvider<Input> {
     name: string;
+    estimateRunTime(input: Input): number;
     run(userIdentifier: string, input: Input, webhookParameters: PredictionCompletionWebhookParameters): Promise<Prediction>;
 
     canProcessHook(query: any, body: any): boolean;

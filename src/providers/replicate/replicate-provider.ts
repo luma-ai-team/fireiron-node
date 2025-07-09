@@ -69,6 +69,7 @@ export abstract class ReplicateProvider<Input> implements PredictionProvider<Inp
         };
     }
 
+    abstract estimateRunTime(input: Input): number;
     abstract makeReplicateOptions(userIdentifier: string, input: Input): Promise<ReplicateOptions>;
     abstract makePrediction(input: Input, output: Replicate.Prediction): Promise<Prediction>;
 }
