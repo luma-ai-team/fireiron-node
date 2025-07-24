@@ -46,7 +46,7 @@ export class PredictionRequestHook<Input> implements FirestoreHook<PredictionReq
             await reference.update({
                 externalIdentifier: result.identifier,
                 continuation: result.continuation,
-                metadata: {...prediction.metadata, ...result.metadata},
+                metadata: {...metadata, ...result.metadata},
                 error: result.error,
                 output: result.output
             });
