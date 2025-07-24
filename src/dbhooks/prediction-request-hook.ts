@@ -4,7 +4,7 @@ import { FirestoreEvent } from "firebase-functions/v2/firestore";
 import { FirestoreAdapter } from "../firebase/firestore-adapter";
 import { FirestoreHook } from "./firestore-hook";
 import { Prediction, PredictionError, PredictionMetadata } from "../models/prediction";
-import { PredictionProvider } from "../providers/provider";
+import { PredictionProvider, PredictionState } from "../providers/provider";
 import { PredictionCompletionHook } from "../webhooks/prediction-completion-hook";
 
 export type PredictionRequestHookDocument<Input> = {
@@ -39,7 +39,7 @@ export class PredictionRequestHook<Input> implements FirestoreHook<PredictionReq
                 const runTime = this.provider.estimateRunTime(prediction.input as Input);
                 await reference.update({
                     "metadata.estimatedCompletionTime": metadata.creationTime + runTime
-                })
+                });
             }
 
             const result = await this.provider.run(userIdentifier, prediction.input as Input, webhookParameters);
@@ -50,6 +50,14 @@ export class PredictionRequestHook<Input> implements FirestoreHook<PredictionReq
                 error: result.error,
                 output: result.output
             });
+
+            if (result.output) {
+                await this.webhook.handleCompletion({
+                    state: PredictionState.Completed,
+                    identifier: predictionIdentifier,
+                    output: result.output
+                }, userIdentifier);
+            }
         }
         catch (error) {
             await reference.update({
