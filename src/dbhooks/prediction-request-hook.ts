@@ -37,8 +37,9 @@ export class PredictionRequestHook<Input> implements FirestoreHook<PredictionReq
             const metadata: PredictionMetadata | undefined = prediction.metadata as PredictionMetadata;
             if (metadata) {
                 const runTime = this.provider.estimateRunTime(prediction.input as Input);
+                metadata["estimatedCompletionTime"] = metadata.creationTime + runTime
                 await reference.update({
-                    "metadata.estimatedCompletionTime": metadata.creationTime + runTime
+                    metadata: metadata
                 });
             }
 
