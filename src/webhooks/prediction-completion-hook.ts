@@ -182,6 +182,6 @@ export class PredictionCompletionHook<Input> implements Webhook {
             error: event.error
         });
 
-        await this.firestore.deposit(userIdentifier, data.cost);
+        await this.firestore.deposit(userIdentifier, data.cost ?? 1);
     }
 }
