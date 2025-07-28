@@ -100,7 +100,7 @@ export class FirestoreAdapter {
         const reference = await this.prepareUserReference(userIdentifier);
         const user = (await reference.get()).data() as User;
         if (user.balance < amount) {
-            throw new Error("Insufficient balance");
+            throw new Error("insufficient_balance");
         }
 
         await reference.update({

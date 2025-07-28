@@ -9,7 +9,8 @@ export type PredictActionRequest<Input> = {
 };
 
 export type PredictActionResponse = {
-    identifier: string;
+    identifier?: string;
+    error?: string;
 };
 
 export class PredictAction<Input> implements Action<PredictActionRequest<Input>> {
@@ -23,7 +24,15 @@ export class PredictAction<Input> implements Action<PredictActionRequest<Input>>
 
     public async run(request: PredictActionRequest<Input>): Promise<PredictActionResponse> {
         const cost = this.provider.cost(request.payload);
-        await this.firestore.withdraw(request.user, cost);
+        try {
+            await this.firestore.withdraw(request.user, cost);
+        }
+        catch (error: any) {
+            return {
+                error: error.message
+            };
+        }
+
         try {
             const currentTime = Math.floor(Date.now() / 1000);
             const metadata: PredictionMetadata = {
