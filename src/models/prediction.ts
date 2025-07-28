@@ -11,6 +11,7 @@ export type PredictionMetadata = {
 export type Prediction = {
     identifier: string;
     input: Object;
+    cost: number;
 
     externalIdentifier?: string;
     continuation?: Object;

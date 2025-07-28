@@ -113,12 +113,13 @@ export class FirestoreAdapter {
         await reference.set(prediction);
     }
 
-    public async createPrediction(userIdentifier: string, input: Object, metadata?: Object): Promise<Prediction> {
+    public async createPrediction(userIdentifier: string, input: Object, cost: number, metadata?: Object): Promise<Prediction> {
         const reference = this.makePredictionReference(userIdentifier);
         const prediction: Prediction = {
             identifier: reference.id,
-            metadata: metadata,
-            input: input
+            input: input,
+            cost: cost,
+            metadata: metadata
         }
         await reference.set(prediction);
         return prediction;

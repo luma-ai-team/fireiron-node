@@ -10,6 +10,7 @@ import { PredictionCompletionHook } from "../webhooks/prediction-completion-hook
 export type PredictionRequestHookDocument<Input> = {
     identifier: string;
     input: Input;
+    cost: number;
 };
 
 export class PredictionRequestHook<Input> implements FirestoreHook<PredictionRequestHookDocument<Input>> {
@@ -59,14 +60,25 @@ export class PredictionRequestHook<Input> implements FirestoreHook<PredictionReq
                     output: result.output
                 }, userIdentifier);
             }
+            else if (result.error) {
+                await this.webhook.handleFailure({
+                    state: PredictionState.Failed,
+                    identifier: predictionIdentifier,
+                    error: result.error
+                }, userIdentifier);
+            }
         }
         catch (error) {
-            await reference.update({
-                error: {
-                    code: -1,
-                    message: `${error}`
-                } as PredictionError
-            });
+            const predictionError: PredictionError = {
+                code: -1,
+                message: `${error}`
+            };
+
+            await this.webhook.handleFailure({
+                state: PredictionState.Failed,
+                identifier: predictionIdentifier,
+                error: predictionError
+            }, userIdentifier);
         }
 
         return {

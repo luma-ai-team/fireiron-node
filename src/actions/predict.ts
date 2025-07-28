@@ -1,5 +1,6 @@
 import { FirestoreAdapter } from "../firebase/firestore-adapter";
 import { PredictionMetadata } from "../models/prediction";
+import { PredictionProvider } from "../providers/provider";
 import { Action } from "./action";
 
 export type PredictActionRequest<Input> = {
@@ -13,28 +14,28 @@ export type PredictActionResponse = {
 
 export class PredictAction<Input> implements Action<PredictActionRequest<Input>> {
     public name = "predict";
-    public cost: number = 1;
-
     firestore: FirestoreAdapter = new FirestoreAdapter();
+    provider: PredictionProvider<Input>;
 
-    public constructor() {
-        //
+    public constructor(provider: PredictionProvider<Input>) {
+        this.provider = provider;
     }
 
     public async run(request: PredictActionRequest<Input>): Promise<PredictActionResponse> {
-        await this.firestore.withdraw(request.user, this.cost);
+        const cost = this.provider.cost(request.payload);
+        await this.firestore.withdraw(request.user, cost);
         try {
             const currentTime = Math.floor(Date.now() / 1000);
             const metadata: PredictionMetadata = {
                 creationTime: currentTime,
             };
-            const prediction = await this.firestore.createPrediction(request.user, request.payload as Object, metadata);
+            const prediction = await this.firestore.createPrediction(request.user, request.payload as Object, cost, metadata);
             return {
                 identifier: prediction.identifier
             };
         }
         catch (error) {
-            await this.firestore.deposit(request.user, this.cost);
+            await this.firestore.deposit(request.user, cost);
             throw error;
         }
     }

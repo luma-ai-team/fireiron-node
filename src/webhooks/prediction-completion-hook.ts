@@ -177,10 +177,11 @@ export class PredictionCompletionHook<Input> implements Webhook {
 
     async handleFailure(event: PredictionFailureEvent, userIdentifier: string) {
         const reference = this.firestore.makePredictionReference(userIdentifier, event.identifier);
+        const data = await this.firestore.fetchPrediction(userIdentifier, event.identifier);
         await reference.update({
             error: event.error
         });
 
-        await this.firestore.deposit(userIdentifier, 1);
+        await this.firestore.deposit(userIdentifier, data.cost);
     }
 }

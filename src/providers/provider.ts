@@ -28,6 +28,8 @@ export type PredictionEvent = PredictionCompletionEvent | PredictionFailureEvent
 
 export interface PredictionProvider<Input> {
     name: string;
+
+    cost(input: Input): number;
     estimateRunTime(input: Input): number;
     run(userIdentifier: string, input: Input, webhookParameters: PredictionCompletionWebhookParameters): Promise<Prediction>;
 
