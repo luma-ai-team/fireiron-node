@@ -5,9 +5,10 @@ import * as Admin from "firebase-admin";
 import * as Firestore from "firebase-admin/firestore";
 import * as Logger from "firebase-functions/logger";
 
-import { Action } from "./src/actions/action";
+import { Action, ScheduledAction } from "./src/actions/action";
 import { Webhook } from "./src/webhooks/webhook";
 import { FirestoreHook } from "./src/dbhooks/firestore-hook";
+import { onSchedule } from "firebase-functions/scheduler";
 
 export * from "./src/firebase/firestore-adapter";
 export * from "./src/firebase/messaging-adapter";
@@ -36,6 +37,7 @@ export * from "./src/models/prediction";
 export class Fireiron {
     exports: any;
     public isLoggingEnabled: boolean = false;
+    public prefix: string = "";
 
     constructor(exports: any) {
         Admin.initializeApp();
@@ -46,7 +48,8 @@ export class Fireiron {
     }
 
     public registerAction<Request>(action: Action<Request>, options: CallableOptions = {}) {
-        this.exports[action.name] = onCall(options, async (request) => {
+        const name = this.makeExportName(action.name);
+        this.exports[name] = onCall(options, async (request) => {
             if (this.isLoggingEnabled) {
                 Logger.log(request.data);
             }
@@ -55,11 +58,19 @@ export class Fireiron {
         });
     }
 
+    public registerScheduledAction(action: ScheduledAction, schedule: string, options: CallableOptions = {}) {
+        const name = this.makeExportName(action.name);
+        this.exports[name] = onSchedule(schedule, async (request) => {
+            return await action.run();
+        });
+    }
+
     public registerDocumentCreateHook<Input>(hook: FirestoreHook<Input>, options: EventHandlerOptions = {}) {
         var documentOptions = options as any;
         documentOptions["document"] = hook.path;
 
-        this.exports[hook.name] = onDocumentCreated(documentOptions as DocumentOptions, async (event) => {
+        const name = this.makeExportName(hook.name);
+        this.exports[name] = onDocumentCreated(documentOptions as DocumentOptions, async (event) => {
             if (this.isLoggingEnabled) {
                 Logger.log(event);
             }
@@ -68,7 +79,8 @@ export class Fireiron {
         });
     }
     public registerWebhook(webhook: Webhook, options: HttpsOptions = {}) {
-        this.exports[webhook.name] = onRequest(options, async (request, response) => {
+        const name = this.makeExportName(webhook.name);
+        this.exports[name] = onRequest(options, async (request, response) => {
             if (this.isLoggingEnabled) {
                 Logger.log(request.query, request.body);
             }
@@ -76,5 +88,9 @@ export class Fireiron {
             const result = await webhook.handle(request);
             response.send(result);
         });
+    }
+
+    private makeExportName(name: string): string {
+        return `${this.prefix}-${name}`;
     }
 }
