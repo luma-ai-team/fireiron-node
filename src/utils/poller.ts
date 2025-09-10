@@ -10,8 +10,8 @@ export class Poller {
     }
 
     public async run<T>(handler: (index: number) => Promise<T>): Promise<T> {
-        var isFinished = false;
-        while (isFinished == false) {
+        this.iteration = 0;
+        while (true) {
             try {
                 return await handler(this.iteration);
             }
