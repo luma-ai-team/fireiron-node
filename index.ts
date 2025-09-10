@@ -34,6 +34,8 @@ export * from "./src/models/user";
 export * from "./src/models/request";
 export * from "./src/models/prediction";
 
+export * from "./src/utils/poller";
+
 export class Fireiron {
     exports: any;
     public isLoggingEnabled: boolean = false;
