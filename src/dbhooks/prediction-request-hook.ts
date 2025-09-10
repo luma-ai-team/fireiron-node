@@ -49,6 +49,7 @@ export class PredictionRequestHook<Input> implements FirestoreHook<PredictionReq
                 externalIdentifier: result.identifier,
                 continuation: result.continuation,
                 metadata: {...metadata, ...result.metadata},
+                intermediate: result.intermediate,
                 error: result.error,
                 output: result.output
             });

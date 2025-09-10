@@ -22,6 +22,7 @@ export interface PredictionFailureEvent {
 export interface PredictionUpdateEvent {
     identifier: string;
     state: PredictionState.Pending;
+    intermediate?: Object;
 }
 
 export type PredictionEvent = PredictionCompletionEvent | PredictionFailureEvent | PredictionUpdateEvent;

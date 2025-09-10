@@ -16,6 +16,8 @@ export type Prediction = {
     externalIdentifier?: string;
     continuation?: Object;
     metadata?: PredictionMetadata | Object;
+
+    intermediate?: Object;
     error?: PredictionError;
     output?: Object;
 };

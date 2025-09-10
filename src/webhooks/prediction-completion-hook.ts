@@ -161,7 +161,14 @@ export class PredictionCompletionHook<Input> implements Webhook {
     }
 
     async handleUpdate(event: PredictionUpdateEvent, userIdentifier: string) {
-        //
+        if (event.intermediate == null) {
+            return;
+        }
+
+        const predictionReference = this.firestore.makePredictionReference(userIdentifier, event.identifier);
+        await predictionReference.update({
+            intermediate: event.intermediate
+        });
     }
 
     async handleCompletion(event: PredictionCompletionEvent, userIdentifier: string) {
