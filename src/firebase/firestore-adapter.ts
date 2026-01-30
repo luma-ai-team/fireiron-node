@@ -125,6 +125,22 @@ export class FirestoreAdapter {
         return prediction;
     }
 
+    public async createLinkedPredictions(userIdentifier: string, prediction: Prediction, count: number): Promise<Prediction[]> {
+        var result = [];
+        for (let index = 0; index < count; index++) {
+            const reference = this.makePredictionReference(userIdentifier);
+            const linkedPrediction: Prediction = {
+                identifier: reference.id,
+                parent: prediction.identifier,
+                input: prediction.input,
+                metadata: prediction.metadata
+            }
+            await reference.set(linkedPrediction);
+            result.push(linkedPrediction);
+        }
+        return result;
+    }
+
     public async fetchPrediction(userIdentifier: string, predictionIdentifier: string): Promise<Prediction> {
         const reference = this.makePredictionReference(userIdentifier, predictionIdentifier);
         const document = await reference.get();

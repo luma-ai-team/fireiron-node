@@ -10,6 +10,8 @@ export type PredictionMetadata = {
 
 export type Prediction = {
     identifier: string;
+    parent?: string;
+    
     input: Object;
     cost?: number;
 
