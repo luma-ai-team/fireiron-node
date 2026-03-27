@@ -93,6 +93,10 @@ export class Fireiron {
     }
 
     private makeExportName(name: string): string {
-        return `${this.prefix}-${name}`;
+        if (this.prefix.length == 0) {
+            return name;
+        }
+
+        return `${this.prefix}.${name}`;
     }
 }
