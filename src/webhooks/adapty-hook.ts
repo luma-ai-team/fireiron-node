@@ -38,6 +38,10 @@ export class AdaptyHook implements Webhook {
         const eventType = request.body.event_type;
         const event = request.body.event_properties;
         const product = event.vendor_product_id;
+        if (event.profile_has_access_level != true) {
+            return;
+        }
+
         const targetEventTypes = ["access_level_updated", "non_subscription_purchase"]
         if (targetEventTypes.includes(eventType) == false) {
             return;
