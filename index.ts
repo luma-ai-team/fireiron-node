@@ -97,6 +97,6 @@ export class Fireiron {
             return name;
         }
 
-        return `${this.prefix}.${name}`;
+        return `${this.prefix}${name}`;
     }
 }
