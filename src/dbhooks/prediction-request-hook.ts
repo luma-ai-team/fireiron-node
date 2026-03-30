@@ -1,5 +1,6 @@
 import { QueryDocumentSnapshot } from "firebase-admin/firestore";
 import { FirestoreEvent } from "firebase-functions/v2/firestore";
+import * as Logger from "firebase-functions/logger";
 
 import { FirestoreAdapter } from "../firebase/firestore-adapter";
 import { FirestoreHook } from "./firestore-hook";
@@ -31,6 +32,11 @@ export class PredictionRequestHook<Input> implements FirestoreHook<PredictionReq
         const predictionIdentifier = event.params.predictionIdentifier;
 
         const prediction = event.data.data() as Prediction;
+        if (prediction == null) {
+            Logger.log(`Skipping incomplete predicion: ${userIdentifier}/${predictionIdentifier}`);
+            return {};
+        }
+
         const webhookParameters = this.webhook.makeParameters(userIdentifier, this.provider.name, predictionIdentifier);
         const reference = this.firestore.makePredictionReference(userIdentifier, predictionIdentifier);
         
