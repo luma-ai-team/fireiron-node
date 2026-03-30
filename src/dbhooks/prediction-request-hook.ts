@@ -32,7 +32,7 @@ export class PredictionRequestHook<Input> implements FirestoreHook<PredictionReq
         const predictionIdentifier = event.params.predictionIdentifier;
 
         const prediction = event.data.data() as Prediction;
-        if (prediction == null) {
+        if ((prediction == null) || (prediction.input == null)) {
             Logger.log(`Skipping incomplete predicion: ${userIdentifier}/${predictionIdentifier}`);
             return {};
         }
