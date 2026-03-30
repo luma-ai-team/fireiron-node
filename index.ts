@@ -82,6 +82,7 @@ export class Fireiron {
     }
     public registerWebhook(webhook: Webhook, options: HttpsOptions = {}) {
         const name = this.makeExportName(webhook.name);
+        webhook.endpoint = name;
         this.exports[name] = onRequest(options, async (request, response) => {
             if (this.isLoggingEnabled) {
                 Logger.log(request.query, request.body);

@@ -105,6 +105,7 @@ export class PredictionCompletionWebhookParameters {
 
 export class PredictionCompletionHook<Input> implements Webhook {
     public name = "predictionHook";
+    endpoint?: string;
     provider: PredictionProvider<Input>;
     domain: string;
 
@@ -122,7 +123,7 @@ export class PredictionCompletionHook<Input> implements Webhook {
     }
 
     public makeParameters(user: string, source: string, identifier?: string, parent?: string): PredictionCompletionWebhookParameters {
-        const options = new PredictionCompletionWebhookParameters(this.domain, this.name, source, user);
+        const options = new PredictionCompletionWebhookParameters(this.domain, this.endpoint ?? this.name, source, user);
         options.identifier = identifier;
         options.parent = parent;
         return options;
