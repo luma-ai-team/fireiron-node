@@ -167,14 +167,18 @@ export class PredictionCompletionHook<Input> implements Webhook {
         }
 
         const predictionReference = this.firestore.makePredictionReference(userIdentifier, event.identifier);
+        const data = await this.firestore.fetchPrediction(userIdentifier, event.identifier);
         await predictionReference.update({
+            metatada: {...data.metadata, ...event.metadata},
             intermediate: event.intermediate
         });
     }
 
     async handleCompletion(event: PredictionCompletionEvent, userIdentifier: string) {
         const predictionReference = this.firestore.makePredictionReference(userIdentifier, event.identifier);
+        const data = await this.firestore.fetchPrediction(userIdentifier, event.identifier);
         await predictionReference.update({
+            metatada: {...data.metadata, ...event.metadata},
             output: event.output
         });
 
@@ -187,6 +191,7 @@ export class PredictionCompletionHook<Input> implements Webhook {
         const reference = this.firestore.makePredictionReference(userIdentifier, event.identifier);
         const data = await this.firestore.fetchPrediction(userIdentifier, event.identifier);
         await reference.update({
+            metatada: {...data.metadata, ...event.metadata},
             error: event.error
         });
 

@@ -1,4 +1,4 @@
-import { Prediction, PredictionError } from "../models/prediction";
+import { Prediction, PredictionError, PredictionMetadata } from "../models/prediction";
 import { PredictionCompletionWebhookParameters } from "../webhooks/prediction-completion-hook";
 
 export enum PredictionState {
@@ -10,18 +10,21 @@ export enum PredictionState {
 export interface PredictionCompletionEvent {
     identifier: string;
     state: PredictionState.Completed;
+    metadata?: PredictionMetadata;
     output: Object;
 }
 
 export interface PredictionFailureEvent {
     identifier: string;
     state: PredictionState.Failed;
+    metadata?: PredictionMetadata;
     error: PredictionError;
 }
 
 export interface PredictionUpdateEvent {
     identifier: string;
     state: PredictionState.Pending;
+    metadata?: PredictionMetadata;
     intermediate?: Object;
 }
 
