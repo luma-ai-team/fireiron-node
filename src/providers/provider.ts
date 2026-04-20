@@ -10,21 +10,21 @@ export enum PredictionState {
 export interface PredictionCompletionEvent {
     identifier: string;
     state: PredictionState.Completed;
-    metadata?: PredictionMetadata;
+    metadata?: PredictionMetadata | Object;
     output: Object;
 }
 
 export interface PredictionFailureEvent {
     identifier: string;
     state: PredictionState.Failed;
-    metadata?: PredictionMetadata;
+    metadata?: PredictionMetadata | Object;
     error: PredictionError;
 }
 
 export interface PredictionUpdateEvent {
     identifier: string;
     state: PredictionState.Pending;
-    metadata?: PredictionMetadata;
+    metadata?: PredictionMetadata | Object;
     intermediate?: Object;
 }
 
