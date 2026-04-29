@@ -44,12 +44,10 @@ export class FirestoreAdapter {
     async makeUserData(identifier: string): Promise<User> {
         const defaults = await this.makeDefaultsReference().get();
         const balance = await defaults.data()?.balance ?? 0;
-        const redeemLimit = await defaults.data()?.redeemLimit ?? 0;
         return {
             identifier: identifier,
             balance: balance,
-            redeemLimit: redeemLimit,
-            pushToken: undefined
+            notificationToken: undefined
         };
     }
 
@@ -82,8 +80,8 @@ export class FirestoreAdapter {
         const document = await reference.get();
         const user = document.data() as User;
 
-        if ((user.purchaseDate != null) && (date != null)) {
-            const previousPurchaseDate = Date.parse(user.purchaseDate);
+        if ((user.paymentDate != null) && (date != null)) {
+            const previousPurchaseDate = Date.parse(user.paymentDate);
             const eventPurchaseDate = Date.parse(date);
             if (previousPurchaseDate >= eventPurchaseDate) {
                 return;

@@ -1,6 +1,6 @@
-export interface Action<Request> {
+export interface Action<Payload> {
     name: string;
-    run(request: Request): Promise<Object>
+    run(payload: Payload, userIdentifier: string): Promise<Object>
 }
 
 export interface ScheduledAction {

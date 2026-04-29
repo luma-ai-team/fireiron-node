@@ -53,7 +53,6 @@ export class PredictionRequestHook<Input> implements FirestoreHook<PredictionReq
             const result = await this.provider.run(userIdentifier, prediction.input as Input, webhookParameters);
             await reference.update({
                 externalIdentifier: result.identifier,
-                continuation: result.continuation,
                 metadata: {...metadata, ...result.metadata},
                 intermediate: result.intermediate,
                 error: result.error,

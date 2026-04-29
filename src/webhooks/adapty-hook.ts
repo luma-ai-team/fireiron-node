@@ -38,7 +38,7 @@ export class AdaptyHook implements Webhook {
         const eventType = request.body.event_type;
         const event = request.body.event_properties;
         const product = event.vendor_product_id;
-        const targetEventTypes = ["access_level_updated", "non_subscription_purchase"]
+        const targetEventTypes = ["subscription_started", "subscription_renewed", "non_subscription_purchase"];
         if (targetEventTypes.includes(eventType) == false) {
             return;
         }

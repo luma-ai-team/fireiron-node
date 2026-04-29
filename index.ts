@@ -15,10 +15,8 @@ export * from "./src/firebase/messaging-adapter";
 export * from "./src/firebase/storage-adapter";
 
 export * from "./src/actions/action";
-export * from "./src/actions/adapty-link";
-export * from "./src/actions/fcm-link";
 export * from "./src/actions/predict";
-export * from "./src/actions/redeem";
+export * from "./src/actions/user";
 
 export * from "./src/webhooks/webhook";
 export * from "./src/webhooks/adapty-hook";
@@ -56,7 +54,13 @@ export class Fireiron {
                 Logger.log(request.data);
             }
 
-            return await action.run(request.data as Request)
+            const userIdentifier = request.auth?.uid;
+            if (userIdentifier == null) {
+                Logger.error("Unauthenticated request", request.data);
+                throw new Error("Unauthenticated request");
+            }
+
+            return await action.run(request.data as Request, userIdentifier)
         });
     }
 

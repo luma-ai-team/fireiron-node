@@ -16,7 +16,6 @@ export type Prediction = {
     cost?: number;
 
     externalIdentifier?: string;
-    continuation?: Object;
     metadata?: PredictionMetadata | Object;
 
     intermediate?: Object;

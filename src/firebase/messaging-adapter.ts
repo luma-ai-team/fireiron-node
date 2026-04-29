@@ -4,12 +4,12 @@ import { User } from "../models/user"
 
 export class MessagingAdapter {
     public async sendCompletionNotification(user: User, predictionIdentifier: string, title: string, message: string) {
-        if (user.pushToken == null) {
+        if (user.notificationToken == null) {
             Logger.warn("No push token for " + user.identifier);
             return;
         }
 
-        Logger.debug("Pushing to " + user.identifier + "/" + user.pushToken);
+        Logger.debug("Pushing to " + user.identifier + "/" + user.notificationToken);
         Messaging.getMessaging().send({
             notification: {
                 title: title,
@@ -18,7 +18,7 @@ export class MessagingAdapter {
             data: {
                 identifier: predictionIdentifier
             },
-            token: user.pushToken
+            token: user.notificationToken
         });
     }
 }
