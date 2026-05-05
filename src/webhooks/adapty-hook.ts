@@ -5,10 +5,22 @@ import * as Logger from "firebase-functions/logger"
 
 export class AdaptyHook implements Webhook {
     public name = "adaptyHook";
+    public authorization?: string;
     firestore: FirestoreAdapter = new FirestoreAdapter();
+
+    constructor(authorization?: string) {
+        this.authorization = authorization
+    }
 
     public async handle(request: Functions.Request): Promise<Object> {
         Logger.debug(request.body);
+        if (this.authorization && (request.headers.authorization != this.authorization)) {
+            Logger.error("[!!] Authorization header mismatch");
+            Logger.log(request.headers);
+            return {
+                adapty_check_response: "invalid"
+            };
+        }
     
         if (request.body.adapty_check != null) {
             return {
